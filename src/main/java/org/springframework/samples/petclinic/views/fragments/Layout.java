@@ -4,13 +4,12 @@ import htmlflow.*;
 import org.xmlet.htmlapifaster.*;
 
 import java.lang.Object;
+import java.util.function.Consumer;
 
 public class Layout {
 
-    public static DynamicHtml<Object> view = (DynamicHtml<Object>) DynamicHtml.view(Layout::template).threadSafe();
-
-    private static <T> void template(DynamicHtml<T> view, T model, HtmlView[] partials) {
-        view
+    public static HtmlView view(Consumer<Div> content) {
+        return HtmlFlow.view(page -> page
             .html()
                 .head()
                     .meta().addAttr("http-equiv","Content-Type").attrContent("text/html; charset=UTF-8")
@@ -105,10 +104,7 @@ public class Layout {
                     .__() //nav
                     .div().attrClass("container-fluid")
                         .div().attrClass("container xd-container")
-                            .dynamic(__ -> {
-                                if(partials[0] instanceof StaticHtml) view.addPartial(partials[0]);
-                                else view.addPartial(partials[0], model);
-                            })
+                            .of(div -> content.accept(div))
                             .br().__() //br
                             .br().__() //br
                             .div().attrClass("container")
@@ -128,6 +124,7 @@ public class Layout {
                     .script().attrSrc("/webjars/bootstrap/3.3.6/js/bootstrap.min.js")
                     .__() //script
                 .__() //body
-            .__(); //html
+            .__() //html
+        ); // return view
     }
 }

@@ -1,16 +1,18 @@
 package org.springframework.samples.petclinic.views;
-import htmlflow.*;
+
+import htmlflow.HtmlView;
 import org.springframework.samples.petclinic.owner.Owner;
+import org.springframework.samples.petclinic.views.fragments.Layout;
+import org.xmlet.htmlapifaster.Div;
 
 import java.util.Collection;
 
 public class OwnersList {
 
-    public static final HtmlView<Collection<Owner>> view = DynamicHtml.view(OwnersList::template).threadSafe();
+    public static final HtmlView view = Layout.view(OwnersList::template).threadSafe();
 
-    static void template(DynamicHtml<Collection<Owner>> view, Collection<Owner> owners) {
-        view
-            .div()
+    static void template(Div<?> container) {
+        container
                 .h2()
                     .text("Owners")
                 .__() //h2
@@ -35,7 +37,7 @@ public class OwnersList {
                         .__() //tr
                     .__() //thead
                     .tbody()
-                        .dynamic(tbody -> owners.forEach(ow -> tbody
+                        .<Collection<Owner>>dynamic((tbody, owners) -> owners.forEach(ow -> tbody
                             .tr()
                                 .td()
                                     .a()
@@ -52,8 +54,7 @@ public class OwnersList {
                             .__()
                         ))
                     .__() //tbody
-                .__() //table
-            .__();
+                .__(); //table
     }
 }
 

@@ -25,10 +25,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 class WelcomeController {
 
+    private final String html = Layout.view(Welcome::template).render();
+
 	@GetMapping("/")
 	@ResponseBody
 	public String welcome() {
-		return Layout.view.render(null, Welcome.view);
+		return html;
 	}
 
 }

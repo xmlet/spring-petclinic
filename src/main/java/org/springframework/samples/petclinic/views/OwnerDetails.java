@@ -1,16 +1,17 @@
 package org.springframework.samples.petclinic.views;
 
-import htmlflow.*;
+import htmlflow.HtmlView;
 import org.springframework.samples.petclinic.owner.Owner;
 import org.springframework.samples.petclinic.owner.Pet;
+import org.springframework.samples.petclinic.views.fragments.Layout;
+import org.xmlet.htmlapifaster.Div;
 
 public class OwnerDetails {
 
-    public static final HtmlView<Owner> view = DynamicHtml.view(OwnerDetails::template).threadSafe();
+    public static final HtmlView view = Layout.view(OwnerDetails::template).threadSafe();
 
-    static void template(DynamicHtml<Owner> view, Owner owner) {
-        view
-            .div()
+    static void template(Div<?> container) {
+            container
                 .h2()
                     .text("Owner Information")
                 .__() //h2
@@ -22,7 +23,7 @@ public class OwnerDetails {
                             .__() //th
                             .td()
                                 .b()
-                                    .dynamic(b -> b.text(owner.getFirstName() + " " + owner.getLastName()))
+                                    .<Owner>dynamic((b, owner) -> b.text(owner.getFirstName() + " " + owner.getLastName()))
                                 .__()
                             .__() //td
                         .__() //tr
@@ -31,7 +32,7 @@ public class OwnerDetails {
                                 .text("Address")
                             .__() //th
                             .td()
-                                .dynamic(td -> td.text(owner.getAddress()))
+                                .<Owner>dynamic((td, owner) -> td.text(owner.getAddress()))
                             .__()
                         .__() //tr
                         .tr()
@@ -39,7 +40,7 @@ public class OwnerDetails {
                                 .text("City")
                             .__() //th
                             .td()
-                                .dynamic(td -> td.text(owner.getCity()))
+                                .<Owner>dynamic((td, owner) -> td.text(owner.getCity()))
                             .__() //td
                         .__() //tr
                         .tr()
@@ -47,15 +48,15 @@ public class OwnerDetails {
                                 .text("Telephone")
                             .__() //th
                             .td()
-                                .dynamic(td -> td.text(owner.getTelephone()))
+                                .<Owner>dynamic((td, owner) -> td.text(owner.getTelephone()))
                             .__() //td
                         .__() //tr
                     .__() //tbody
                 .__() //table
-                .a().dynamic(a -> a.attrHref(owner.getId() + "/edit").attrClass("btn btn-default"))
+                .a().<Owner>dynamic((a, owner) -> a.attrHref(owner.getId() + "/edit").attrClass("btn btn-default"))
                     .text("Edit Owner")
                 .__() //a
-                .a().dynamic(a -> a.attrHref(owner.getId() + "/pets/new").attrClass("btn btn-default"))
+                .a().<Owner>dynamic((a, owner) -> a.attrHref(owner.getId() + "/pets/new").attrClass("btn btn-default"))
                     .text("Add New Pet")
                 .__() //a
                 .br().__() //br
@@ -64,7 +65,7 @@ public class OwnerDetails {
                 .h2().text("Pets and Visits").__() //h2
                 .table().attrClass("table table-striped")
                     .tbody()
-                        .dynamic(tbody -> owner.getPets().forEach(pet -> tbody
+                        .<Owner>dynamic((tbody, owner) -> owner.getPets().forEach(pet -> tbody
                             .tr()
                                 .td().addAttr("valign","top")
                                     .dl().attrClass("dl-horizontal")
@@ -109,8 +110,7 @@ public class OwnerDetails {
                             .__()
                         ))
                         .__()
-                    .__()
-                .__();
+                    .__();
     }
 
     static String path(Owner owner, Pet pet) {

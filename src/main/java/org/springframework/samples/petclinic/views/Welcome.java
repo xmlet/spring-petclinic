@@ -1,11 +1,10 @@
 package org.springframework.samples.petclinic.views;
 
-import htmlflow.HtmlView;
-import htmlflow.StaticHtml;
+import org.xmlet.htmlapifaster.Div;
 
 public class Welcome {
-    public static HtmlView view = StaticHtml
-        .view()
+    public static void template (Div<?> container) {
+        container
             .div()
                 .h2()
                     .text("Welcome")
@@ -17,4 +16,5 @@ public class Welcome {
                     .__() //div
                 .__() //div
             .__();
+    }
 }

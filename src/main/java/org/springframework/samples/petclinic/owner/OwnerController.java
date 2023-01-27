@@ -19,7 +19,6 @@ import org.springframework.samples.petclinic.views.CreateOrUpdateOwnerForm;
 import org.springframework.samples.petclinic.views.OwnerDetails;
 import org.springframework.samples.petclinic.views.OwnersFind;
 import org.springframework.samples.petclinic.views.OwnersList;
-import org.springframework.samples.petclinic.views.fragments.Layout;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -67,7 +66,7 @@ class OwnerController {
 	@GetMapping("/owners/new")
 	@ResponseBody
 	public String initCreationForm(Map<String, Object> model) {
-        return Layout.view.render(null, CreateOrUpdateOwnerForm.view);
+        return CreateOrUpdateOwnerForm.view.render();
 	}
 
 	@PostMapping("/owners/new")
@@ -77,7 +76,7 @@ class OwnerController {
             /**
              * !!! To Do: add errors from BindingResult to the model to be rendered by the view.
              */
-			return Layout.view.render(null, CreateOrUpdateOwnerForm.view);
+			return CreateOrUpdateOwnerForm.view.render();
 		}
 		else {
 			this.owners.save(owner);
@@ -89,7 +88,7 @@ class OwnerController {
 	@GetMapping("/owners/find")
 	@ResponseBody
 	public String initFindForm(Map<String, Object> model) {
-		return Layout.view.render(null, OwnersFind.view);
+		return OwnersFind.view.render();
 	}
 
 	@GetMapping("/owners")
@@ -103,14 +102,14 @@ class OwnerController {
 
 		// find owners by last name
 		Collection<Owner> results = this.owners.findByLastName(owner.getLastName());
-		return Layout.view.render(results, OwnersList.view);
+		return OwnersList.view.render(results);
 	}
 
 	@GetMapping("/owners/{ownerId}/edit")
 	@ResponseBody
 	public String initUpdateOwnerForm(@PathVariable("ownerId") int ownerId, Model model) {
 		Owner owner = this.owners.findById(ownerId);
-		return Layout.view.render(owner, CreateOrUpdateOwnerForm.view);
+		return CreateOrUpdateOwnerForm.view.render(owner);
 	}
 
 	@PostMapping("/owners/{ownerId}/edit")
@@ -125,7 +124,7 @@ class OwnerController {
             /**
              * !!! To Do: add errors from BindingResult to the model to be rendered by the view.
              */
-			return Layout.view.render(owner, CreateOrUpdateOwnerForm.view);
+			return CreateOrUpdateOwnerForm.view.render(owner);
 		}
 		else {
 			owner.setId(ownerId);
@@ -147,7 +146,7 @@ class OwnerController {
 		for (Pet pet : owner.getPets()) {
 			pet.setVisitsInternal(visits.findByPetId(pet.getId()));
 		}
-		return Layout.view.render(owner, OwnerDetails.view);
+		return OwnerDetails.view.render(owner);
 	}
 
 }

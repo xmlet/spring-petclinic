@@ -16,7 +16,6 @@
 package org.springframework.samples.petclinic.vet;
 
 import org.springframework.samples.petclinic.views.VetList;
-import org.springframework.samples.petclinic.views.fragments.Layout;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -43,7 +42,7 @@ class VetController {
 	@ResponseBody
 	public String showVetList(Map<String, Object> model) {
         Collection<Vet> vets = this.vets.findAll();
-        return Layout.view.render(vets, VetList.view);
+        return VetList.view.render(vets);
 	}
 
 	@GetMapping({ "/vets" })

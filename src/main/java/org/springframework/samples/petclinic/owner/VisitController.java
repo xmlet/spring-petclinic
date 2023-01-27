@@ -16,7 +16,6 @@
 package org.springframework.samples.petclinic.owner;
 
 import org.springframework.samples.petclinic.views.CreateOrUpdateVisitForm;
-import org.springframework.samples.petclinic.views.fragments.Layout;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
@@ -85,7 +84,7 @@ class VisitController {
 	public String initNewVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
 	    Pet pet = this.pets.findById(petId);
 		pet.setVisitsInternal(this.visits.findByPetId(petId));
-		return Layout.view.render(pet, CreateOrUpdateVisitForm.view);
+		return CreateOrUpdateVisitForm.view.render(pet);
 	}
 
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
@@ -104,7 +103,7 @@ class VisitController {
              */
             Pet pet = this.pets.findById(petId);
             pet.setVisitsInternal(this.visits.findByPetId(petId));
-			return Layout.view.render(pet, CreateOrUpdateVisitForm.view);
+			return CreateOrUpdateVisitForm.view.render(pet);
 		}
 		else {
 			this.visits.save(visit);
