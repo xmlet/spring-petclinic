@@ -1,21 +1,21 @@
 package org.springframework.samples.petclinic.views;
 
-import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
 import org.springframework.samples.petclinic.model.NamedEntity;
 import org.springframework.samples.petclinic.vet.Specialty;
 import org.springframework.samples.petclinic.vet.Vet;
+import org.springframework.samples.petclinic.views.fragments.Layout;
+import org.xmlet.htmlapifaster.Div;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class VetList {
 
-    public static HtmlView<Iterable<Vet>> view = DynamicHtml.view(VetList::template).threadSafe();
+    public static HtmlView view = Layout.view(VetList::template).threadSafe();
 
-    static void template(DynamicHtml<Iterable<Vet>> view, Iterable<Vet> vets) {
-        view
-            .div()
+    static void template(Div<?> container) {
+            container
                 .h2()
                     .text("Veterinarians")
                 .__() //h2
@@ -31,7 +31,7 @@ public class VetList {
                         .__() //tr
                     .__() //thead
                     .tbody()
-                        .dynamic(tbody -> vets.forEach(v -> tbody
+                        .<Iterable<Vet>>dynamic((tbody, vets) -> vets.forEach(v -> tbody
                             .tr()
                                 .td()
                                     .text(v.getFirstName() + " " + v.getLastName())
@@ -44,8 +44,7 @@ public class VetList {
                             .__() //tr
                         ))
                     .__() //tbody
-                .__() //table
-            .__();
+                .__(); //table
     }
 
     private static String format(List<Specialty> specialties) {

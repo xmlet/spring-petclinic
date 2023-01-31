@@ -1,14 +1,17 @@
 package org.springframework.samples.petclinic.views;
 
 import htmlflow.HtmlView;
-import htmlflow.StaticHtml;
+import org.springframework.samples.petclinic.views.fragments.Layout;
+import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.EnumMethodType;
 import org.xmlet.htmlapifaster.EnumTypeButtonType;
 
 public class OwnersFind {
-    public static final HtmlView view = StaticHtml
-        .view()
-            .div()
+
+    public static final HtmlView view = Layout.view(OwnersFind::template).threadSafe();
+
+    public static void template(Div<?> container) {
+            container
                 .h2()
                     .text("Find Owners")
                 .__() //h2
@@ -47,6 +50,6 @@ public class OwnersFind {
                 .br().__() //br
                 .a().attrClass("btn btn-default").attrHref("/owners/new")
                     .text("Add Owner")
-                .__() //a
-            .__();
+                .__(); //a
+    }
 }

@@ -1,22 +1,24 @@
 package org.springframework.samples.petclinic.views;
 
-import htmlflow.DynamicHtml;
 import htmlflow.HtmlView;
 import org.springframework.samples.petclinic.owner.Pet;
 import org.springframework.samples.petclinic.views.fragments.InputField;
+import org.springframework.samples.petclinic.views.fragments.Layout;
+import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.EnumMethodType;
 import org.xmlet.htmlapifaster.EnumTypeButtonType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 
 import java.time.LocalDate;
 
+import static org.springframework.samples.petclinic.views.fragments.InputField.partialInputField;
+
 public class CreateOrUpdateVisitForm {
 
-    public static HtmlView<Pet> view = DynamicHtml.view(CreateOrUpdateVisitForm::template).threadSafe();
+    public static HtmlView view = Layout.view(CreateOrUpdateVisitForm::template).threadSafe();
 
-    static void template(DynamicHtml<Pet> view, Pet pet) {
-        view
-            .div()
+    static void template(Div<?> container) {
+            container
                 .h2()
                     .text("New Visit")
                 .__() //h2
@@ -42,16 +44,16 @@ public class CreateOrUpdateVisitForm {
                     .__() //thead
                     .tbody()
                         .tr()
-                            .td().dynamic(td -> td
+                            .td().<Pet>dynamic((td, pet) -> td
                                 .text(pet != null && pet.getName() != null ? pet.getName() : ""))
                             .__() //td
-                            .td().dynamic(td -> td
+                            .td().<Pet>dynamic((td, pet) -> td
                                 .text(pet != null && pet.getBirthDate() != null ? pet.getBirthDate() : ""))
                             .__() //td
-                            .td().dynamic(td -> td
+                            .td().<Pet>dynamic((td, pet) -> td
                                 .text(pet != null && pet.getType() != null ? pet.getType() : ""))
                             .__() //td
-                            .td().dynamic(td -> td
+                            .td().<Pet>dynamic((td, pet) -> td
                                 .text(pet != null && pet.getOwner() != null ? pet.getOwner().getFirstName() + " " + pet.getOwner().getLastName() : ""))
                             .__() //td
                         .__() //tr
@@ -59,15 +61,15 @@ public class CreateOrUpdateVisitForm {
                 .__() //table
                 .form().attrClass("form-horizontal").attrMethod(EnumMethodType.POST)
                     .div().attrClass("form-group has-feedback")
-                        .dynamic(div -> view.addPartial(InputField.view, InputField.LV.of("Date", "date", LocalDate.now())))
-                        .of(div -> view.addPartial(InputField.view, InputField.LV.of("Description", "description", "")))
+                        .<Pet>dynamic((div, pet) -> partialInputField(div, "Date", "date", LocalDate.now()))
+                        .of(div -> partialInputField(div, "Description", "description", ""))
                     .__() //div
                     .div().attrClass("form-group")
                         .div().attrClass("col-sm-offset-2 col-sm-10")
                             .input()
                                 .attrType(EnumTypeInputType.HIDDEN)
                                 .attrName("petId")
-                                .dynamic(in -> in.attrValue(pet != null && pet.getId() != null ? pet.getId().toString() : ""))
+                                .<Pet>dynamic((in, pet) -> in.attrValue(pet != null && pet.getId() != null ? pet.getId().toString() : ""))
                             .__() //input
                             .button().attrClass("btn btn-default").attrType(EnumTypeButtonType.SUBMIT)
                                 .text("Add Visit")
@@ -87,7 +89,7 @@ public class CreateOrUpdateVisitForm {
                                 .text("Description")
                             .__() //th
                         .__() //tr
-                        .dynamic(tbody -> pet.getVisits().forEach(v -> tbody
+                        .<Pet>dynamic((tbody, pet) -> pet.getVisits().forEach(v -> tbody
                             .tr()
                                 .td()
                                     .text(v.getDate())
@@ -98,7 +100,6 @@ public class CreateOrUpdateVisitForm {
                             .__() //tr
                         ))
                     .__() //tbody
-                .__() //table
-            .__();
+                .__(); //table
     }
 }

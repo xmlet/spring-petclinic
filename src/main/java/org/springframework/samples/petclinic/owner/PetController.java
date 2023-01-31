@@ -16,7 +16,6 @@
 package org.springframework.samples.petclinic.owner;
 
 import org.springframework.samples.petclinic.views.CreateOrUpdatePetForm;
-import org.springframework.samples.petclinic.views.fragments.Layout;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -84,7 +83,7 @@ class PetController {
 	public String initCreationForm(Owner owner, ModelMap model) {
 		Pet pet = new Pet();
 		owner.addPet(pet);
-		return Layout.view.render(pet, petsForm.view);
+		return petsForm.view.render(pet);
 	}
 
 	@PostMapping("/pets/new")
@@ -107,7 +106,7 @@ class PetController {
 			// model.put("pet", pet);
 			pet = new Pet(); // Clear pet to format view as add new operation.
 		    owner.addPet(pet);
-			return Layout.view.render(null, petsForm.view);
+			return petsForm.view.render(pet);
 		}
 		else {
 			this.pets.save(pet);
@@ -120,7 +119,7 @@ class PetController {
 	@ResponseBody
 	public String initUpdateForm(@PathVariable("petId") int petId) {
 		Pet pet = this.pets.findById(petId);
-		return Layout.view.render(pet, petsForm.view);
+		return petsForm.view.render(pet);
 	}
 
 	@PostMapping("/pets/{petId}/edit")
@@ -136,7 +135,7 @@ class PetController {
 		if (result.hasErrors()) {
 			pet.setOwner(owner);
 			model.put("pet", pet);
-			return Layout.view.render(pet, petsForm.view);
+			return petsForm.view.render(pet);
 		}
 		else {
 		    pet.setId(petId);
