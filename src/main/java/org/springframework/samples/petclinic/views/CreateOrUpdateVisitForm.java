@@ -61,8 +61,8 @@ public class CreateOrUpdateVisitForm {
                 .__() //table
                 .form().attrClass("form-horizontal").attrMethod(EnumMethodType.POST)
                     .div().attrClass("form-group has-feedback")
-                        .<Pet>dynamic((div, pet) -> partialInputField(div, InputField.LV.of("Date", "date", LocalDate.now())))
-                        .of(div -> partialInputField(div, InputField.LV.of("Description", "description", "")))
+                        .<Pet>dynamic((div, pet) -> partialInputField(div, "Date", "date", LocalDate.now()))
+                        .of(div -> partialInputField(div, "Description", "description", ""))
                     .__() //div
                     .div().attrClass("form-group")
                         .div().attrClass("col-sm-offset-2 col-sm-10")

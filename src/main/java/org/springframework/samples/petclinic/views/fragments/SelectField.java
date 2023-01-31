@@ -4,20 +4,7 @@ import org.xmlet.htmlapifaster.Div;
 
 public class SelectField {
 
-    public static class DS {
-        final Iterable data;
-        final String selected;
-
-        public DS(Iterable data, String selected) {
-            this.data = data;
-            this.selected = selected;
-        }
-        public static DS of(Iterable data, String selected) {
-            return new DS(data, selected);
-        }
-    }
-
-    public static void partialSelectField(Div<?> container, DS src) {
+    public static void partialSelectField(Div<?> container, Iterable data, String selected) {
         container.div()
             .attrClass("form-group")
             .label().attrClass("col-sm-2 control-label")
@@ -25,11 +12,11 @@ public class SelectField {
             .__() //label
             .div().attrClass("col-sm-10")
                 .select().attrId("type").attrName("type")
-                    .of(select -> src.data.forEach(item -> select
+                    .of(select -> data.forEach(item -> select
                         .option()
                             .attrValue(item.toString())
                             .of(opt -> {
-                                if(src.selected != null && src.selected.equals(item.toString()))
+                                if(selected != null && selected.equals(item.toString()))
                                     opt.attrSelected(true);
                             })
                             .text(item)

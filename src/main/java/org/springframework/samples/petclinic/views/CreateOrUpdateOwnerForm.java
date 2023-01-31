@@ -2,7 +2,6 @@ package org.springframework.samples.petclinic.views;
 
 import htmlflow.HtmlView;
 import org.springframework.samples.petclinic.owner.Owner;
-import org.springframework.samples.petclinic.views.fragments.InputField;
 import org.springframework.samples.petclinic.views.fragments.Layout;
 import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.EnumMethodType;
@@ -25,11 +24,11 @@ public class CreateOrUpdateOwnerForm {
                 .__() //h2
                 .form().attrClass("form-horizontal").attrId("add-owner-form").attrMethod(EnumMethodType.POST)
                     .div().attrClass("form-group has-feedback")
-                        .<Owner>dynamic((div, owner) -> partialInputField(div, InputField.LV.of("First Name", "firstName", from(owner, o -> o.getFirstName()))))
-                        .<Owner>dynamic((div, owner) -> partialInputField(div, InputField.LV.of("Last Name", "lastName", from(owner, o -> o.getLastName()))))
-                        .<Owner>dynamic((div, owner) -> partialInputField(div, InputField.LV.of("Address", "address", from(owner, o -> o.getAddress()))))
-                        .<Owner>dynamic((div, owner) -> partialInputField(div, InputField.LV.of("City", "city", from(owner, o -> o.getCity()))))
-                        .<Owner>dynamic((div, owner) -> partialInputField(div, InputField.LV.of("Telephone", "telephone", from(owner, o -> o.getTelephone()))))
+                        .<Owner>dynamic((div, owner) -> partialInputField(div, "First Name", "firstName", from(owner, o -> o.getFirstName())))
+                        .<Owner>dynamic((div, owner) -> partialInputField(div, "Last Name", "lastName", from(owner, o -> o.getLastName())))
+                        .<Owner>dynamic((div, owner) -> partialInputField(div, "Address", "address", from(owner, o -> o.getAddress())))
+                        .<Owner>dynamic((div, owner) -> partialInputField(div, "City", "city", from(owner, o -> o.getCity())))
+                        .<Owner>dynamic((div, owner) -> partialInputField(div, "Telephone", "telephone", from(owner, o -> o.getTelephone())))
                     .__() //div
                     .div().attrClass("form-group")
                         .div().attrClass("col-sm-offset-2 col-sm-10")

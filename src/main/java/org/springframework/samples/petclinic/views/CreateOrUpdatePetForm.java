@@ -4,9 +4,7 @@ import htmlflow.HtmlView;
 import org.springframework.samples.petclinic.owner.Pet;
 import org.springframework.samples.petclinic.owner.PetRepository;
 import org.springframework.samples.petclinic.owner.PetType;
-import org.springframework.samples.petclinic.views.fragments.InputField;
 import org.springframework.samples.petclinic.views.fragments.Layout;
-import org.springframework.samples.petclinic.views.fragments.SelectField;
 import org.springframework.stereotype.Component;
 import org.xmlet.htmlapifaster.Div;
 import org.xmlet.htmlapifaster.EnumMethodType;
@@ -54,9 +52,9 @@ public class CreateOrUpdatePetForm {
                                 .__() //span
                             .__() //div
                         .__() //div
-                        .<Pet>dynamic((div, pet) -> partialInputField(div, InputField.LV.of("Name", "name", from(pet, o -> o.getName()))))
-                        .<Pet>dynamic((div, pet) -> partialInputField(div, InputField.LV.of("Birth Date", "birthDate", from(pet, p -> p.getBirthDate()))))
-                        .<Pet>dynamic((div, pet) -> partialSelectField(div, SelectField.DS.of(petTypes, from(pet, p -> p.getType()))))
+                        .<Pet>dynamic((div, pet) -> partialInputField(div, "Name", "name", from(pet, o -> o.getName())))
+                        .<Pet>dynamic((div, pet) -> partialInputField(div, "Birth Date", "birthDate", from(pet, p -> p.getBirthDate())))
+                        .<Pet>dynamic((div, pet) -> partialSelectField(div, petTypes, from(pet, p -> p.getType())))
                     .__() //div
                     .div().attrClass("form-group")
                         .div().attrClass("col-sm-offset-2 col-sm-10")
