@@ -15,6 +15,8 @@
  */
 package org.springframework.samples.petclinic.vet;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.views.VetList;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,9 +42,9 @@ class VetController {
 
 	@GetMapping("/vets.html")
 	@ResponseBody
-	public String showVetList(Map<String, Object> model) {
+	public ResponseEntity<String> showVetList(Map<String, Object> model) {
 		Collection<Vet> vets = this.vets.findAll();
-		return VetList.view.render(vets);
+		return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(VetList.view.render(vets));
 	}
 
 	@GetMapping({ "/vets" })

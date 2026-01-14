@@ -16,6 +16,8 @@
 
 package org.springframework.samples.petclinic.system;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.views.Welcome;
 import org.springframework.samples.petclinic.views.fragments.Layout;
 import org.springframework.stereotype.Controller;
@@ -29,8 +31,8 @@ class WelcomeController {
 
 	@GetMapping("/")
 	@ResponseBody
-	public String welcome() {
-		return html;
+	public ResponseEntity<String> welcome() {
+		return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(html);
 	}
 
 }
