@@ -15,6 +15,9 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.views.CreateOrUpdateVisitForm;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
@@ -28,9 +31,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -41,8 +45,8 @@ import java.util.Map;
  * @author Dave Syer
  * @author Miguel Gamboa
  *
- * This controller is based on seminal implementation for Thymeleaf and modified
- * for HtmlFlow.
+ * This controller is based on seminal implementation for Thymeleaf and modified for
+ * HtmlFlow.
  */
 @Controller
 class VisitController {
@@ -81,34 +85,29 @@ class VisitController {
 	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is called
 	@GetMapping("/owners/*/pets/{petId}/visits/new")
 	@ResponseBody
-	public String initNewVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
-	    Pet pet = this.pets.findById(petId);
+	public ResponseEntity<String> initNewVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
+		Pet pet = this.pets.findById(petId);
 		pet.setVisitsInternal(this.visits.findByPetId(petId));
-		return CreateOrUpdateVisitForm.view.render(pet);
+		return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(CreateOrUpdateVisitForm.view.render(pet));
 	}
 
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	@ResponseBody
-	public String processNewVisitForm(
-	    @Valid Visit visit,
-	    BindingResult result,
-	    @PathVariable("petId") int petId,
-	    @PathVariable("ownerId") int ownerId,
-	    HttpServletResponse response) throws IOException
-    {
+	public ResponseEntity<String> processNewVisitForm(@Valid Visit visit, BindingResult result,
+			@PathVariable("petId") int petId, @PathVariable("ownerId") int ownerId, HttpServletResponse response)
+			throws IOException {
 		if (result.hasErrors()) {
-            /**
-             * !!!!! To Do: parse errors and show them in the visit form.
-             */
-            Pet pet = this.pets.findById(petId);
-            pet.setVisitsInternal(this.visits.findByPetId(petId));
-			return CreateOrUpdateVisitForm.view.render(pet);
+			/**
+			 * !!!!! To Do: parse errors and show them in the visit form.
+			 */
+			Pet pet = this.pets.findById(petId);
+			pet.setVisitsInternal(this.visits.findByPetId(petId));
+			return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(CreateOrUpdateVisitForm.view.render(pet));
 		}
 		else {
 			this.visits.save(visit);
-			response.sendRedirect("/owners/" + ownerId);
-			return "";
+			return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create("/owners/" + ownerId)).build();
 		}
 	}
 

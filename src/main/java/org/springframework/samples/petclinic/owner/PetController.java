@@ -15,6 +15,9 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.views.CreateOrUpdatePetForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -28,9 +31,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 
 /**
@@ -39,20 +43,20 @@ import java.util.Collection;
  * @author Arjen Poutsma
  * @author Miguel Gamboa
  *
- * This controller is based on seminal implementation for Thymeleaf and modified
- * for HtmlFlow.
+ * This controller is based on seminal implementation for Thymeleaf and modified for
+ * HtmlFlow.
  */
 @Controller
 @RequestMapping("/owners/{ownerId}")
 class PetController {
 
-    private final CreateOrUpdatePetForm petsForm;
+	private final CreateOrUpdatePetForm petsForm;
 
-    private final PetRepository pets;
+	private final PetRepository pets;
 
 	private final OwnerRepository owners;
 
-    public PetController(PetRepository pets, OwnerRepository owners, CreateOrUpdatePetForm petsForm) {
+	public PetController(PetRepository pets, OwnerRepository owners, CreateOrUpdatePetForm petsForm) {
 		this.pets = pets;
 		this.owners = owners;
 		this.petsForm = petsForm;
@@ -80,69 +84,56 @@ class PetController {
 
 	@GetMapping("/pets/new")
 	@ResponseBody
-	public String initCreationForm(Owner owner, ModelMap model) {
+	public ResponseEntity<String> initCreationForm(Owner owner, ModelMap model) {
 		Pet pet = new Pet();
 		owner.addPet(pet);
-		return petsForm.view.render(pet);
+		return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(petsForm.view.render(pet));
 	}
 
 	@PostMapping("/pets/new")
 	@ResponseBody
-	public String processCreationForm(
-	    Owner owner,
-	    @Valid Pet pet,
-	    BindingResult result,
-	    ModelMap model,
-	    HttpServletResponse response) throws IOException
-    {
-	    // !!!! To Do: Validate duplications and present corresponding errors
-	    /*
-		if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
-			result.rejectValue("name", "duplicate", "already exists");
-		}
-		*/
+	public ResponseEntity<String> processCreationForm(Owner owner, @Valid Pet pet, BindingResult result, ModelMap model,
+			HttpServletResponse response) throws IOException {
+		// !!!! To Do: Validate duplications and present corresponding errors
+		/*
+		 * if (StringUtils.hasLength(pet.getName()) && pet.isNew() &&
+		 * owner.getPet(pet.getName(), true) != null) { result.rejectValue("name",
+		 * "duplicate", "already exists"); }
+		 */
 		owner.addPet(pet);
 		if (result.hasErrors()) {
 			// model.put("pet", pet);
 			pet = new Pet(); // Clear pet to format view as add new operation.
-		    owner.addPet(pet);
-			return petsForm.view.render(pet);
+			owner.addPet(pet);
+			return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(petsForm.view.render(pet));
 		}
 		else {
 			this.pets.save(pet);
-			response.sendRedirect("/owners/" + owner.getId());
-			return "";
+			return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create("/owners/" + owner.getId())).build();
 		}
 	}
 
 	@GetMapping("/pets/{petId}/edit")
 	@ResponseBody
-	public String initUpdateForm(@PathVariable("petId") int petId) {
+	public ResponseEntity<String> initUpdateForm(@PathVariable("petId") int petId) {
 		Pet pet = this.pets.findById(petId);
-		return petsForm.view.render(pet);
+		return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(petsForm.view.render(pet));
 	}
 
 	@PostMapping("/pets/{petId}/edit")
 	@ResponseBody
-	public String processUpdateForm(
-	    @Valid Pet pet,
-	    BindingResult result,
-	    Owner owner,
-	    ModelMap model,
-	    HttpServletResponse response,
-	    @PathVariable("petId") int petId) throws IOException
-    {
+	public ResponseEntity<String> processUpdateForm(@Valid Pet pet, BindingResult result, Owner owner, ModelMap model,
+			HttpServletResponse response, @PathVariable("petId") int petId) throws IOException {
 		if (result.hasErrors()) {
 			pet.setOwner(owner);
 			model.put("pet", pet);
-			return petsForm.view.render(pet);
+			return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(petsForm.view.render(pet));
 		}
 		else {
-		    pet.setId(petId);
+			pet.setId(petId);
 			pet.setOwner(owner);
 			this.pets.save(pet);
-			response.sendRedirect("/owners/" + owner.getId());
-			return "";
+			return ResponseEntity.status(HttpStatus.SEE_OTHER).location(URI.create("/owners/" + owner.getId())).build();
 		}
 	}
 
