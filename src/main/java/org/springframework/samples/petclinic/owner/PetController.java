@@ -39,20 +39,20 @@ import java.util.Collection;
  * @author Arjen Poutsma
  * @author Miguel Gamboa
  *
- * This controller is based on seminal implementation for Thymeleaf and modified
- * for HtmlFlow.
+ * This controller is based on seminal implementation for Thymeleaf and modified for
+ * HtmlFlow.
  */
 @Controller
 @RequestMapping("/owners/{ownerId}")
 class PetController {
 
-    private final CreateOrUpdatePetForm petsForm;
+	private final CreateOrUpdatePetForm petsForm;
 
-    private final PetRepository pets;
+	private final PetRepository pets;
 
 	private final OwnerRepository owners;
 
-    public PetController(PetRepository pets, OwnerRepository owners, CreateOrUpdatePetForm petsForm) {
+	public PetController(PetRepository pets, OwnerRepository owners, CreateOrUpdatePetForm petsForm) {
 		this.pets = pets;
 		this.owners = owners;
 		this.petsForm = petsForm;
@@ -88,24 +88,19 @@ class PetController {
 
 	@PostMapping("/pets/new")
 	@ResponseBody
-	public String processCreationForm(
-	    Owner owner,
-	    @Valid Pet pet,
-	    BindingResult result,
-	    ModelMap model,
-	    HttpServletResponse response) throws IOException
-    {
-	    // !!!! To Do: Validate duplications and present corresponding errors
-	    /*
-		if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
-			result.rejectValue("name", "duplicate", "already exists");
-		}
-		*/
+	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result, ModelMap model,
+			HttpServletResponse response) throws IOException {
+		// !!!! To Do: Validate duplications and present corresponding errors
+		/*
+		 * if (StringUtils.hasLength(pet.getName()) && pet.isNew() &&
+		 * owner.getPet(pet.getName(), true) != null) { result.rejectValue("name",
+		 * "duplicate", "already exists"); }
+		 */
 		owner.addPet(pet);
 		if (result.hasErrors()) {
 			// model.put("pet", pet);
 			pet = new Pet(); // Clear pet to format view as add new operation.
-		    owner.addPet(pet);
+			owner.addPet(pet);
 			return petsForm.view.render(pet);
 		}
 		else {
@@ -124,21 +119,15 @@ class PetController {
 
 	@PostMapping("/pets/{petId}/edit")
 	@ResponseBody
-	public String processUpdateForm(
-	    @Valid Pet pet,
-	    BindingResult result,
-	    Owner owner,
-	    ModelMap model,
-	    HttpServletResponse response,
-	    @PathVariable("petId") int petId) throws IOException
-    {
+	public String processUpdateForm(@Valid Pet pet, BindingResult result, Owner owner, ModelMap model,
+			HttpServletResponse response, @PathVariable("petId") int petId) throws IOException {
 		if (result.hasErrors()) {
 			pet.setOwner(owner);
 			model.put("pet", pet);
 			return petsForm.view.render(pet);
 		}
 		else {
-		    pet.setId(petId);
+			pet.setId(petId);
 			pet.setOwner(owner);
 			this.pets.save(pet);
 			response.sendRedirect("/owners/" + owner.getId());

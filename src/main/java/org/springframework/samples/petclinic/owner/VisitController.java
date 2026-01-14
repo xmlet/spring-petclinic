@@ -41,8 +41,8 @@ import java.util.Map;
  * @author Dave Syer
  * @author Miguel Gamboa
  *
- * This controller is based on seminal implementation for Thymeleaf and modified
- * for HtmlFlow.
+ * This controller is based on seminal implementation for Thymeleaf and modified for
+ * HtmlFlow.
  */
 @Controller
 class VisitController {
@@ -82,7 +82,7 @@ class VisitController {
 	@GetMapping("/owners/*/pets/{petId}/visits/new")
 	@ResponseBody
 	public String initNewVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
-	    Pet pet = this.pets.findById(petId);
+		Pet pet = this.pets.findById(petId);
 		pet.setVisitsInternal(this.visits.findByPetId(petId));
 		return CreateOrUpdateVisitForm.view.render(pet);
 	}
@@ -90,19 +90,14 @@ class VisitController {
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is called
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	@ResponseBody
-	public String processNewVisitForm(
-	    @Valid Visit visit,
-	    BindingResult result,
-	    @PathVariable("petId") int petId,
-	    @PathVariable("ownerId") int ownerId,
-	    HttpServletResponse response) throws IOException
-    {
+	public String processNewVisitForm(@Valid Visit visit, BindingResult result, @PathVariable("petId") int petId,
+			@PathVariable("ownerId") int ownerId, HttpServletResponse response) throws IOException {
 		if (result.hasErrors()) {
-            /**
-             * !!!!! To Do: parse errors and show them in the visit form.
-             */
-            Pet pet = this.pets.findById(petId);
-            pet.setVisitsInternal(this.visits.findByPetId(petId));
+			/**
+			 * !!!!! To Do: parse errors and show them in the visit form.
+			 */
+			Pet pet = this.pets.findById(petId);
+			pet.setVisitsInternal(this.visits.findByPetId(petId));
 			return CreateOrUpdateVisitForm.view.render(pet);
 		}
 		else {

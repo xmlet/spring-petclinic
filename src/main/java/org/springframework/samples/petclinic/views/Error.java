@@ -6,17 +6,19 @@ import org.xmlet.htmlapifaster.Div;
 
 public class Error {
 
-    public static HtmlView view = Layout.view(Error::template).threadSafe();
+	public static HtmlView view = Layout.view(Error::template).threadSafe();
 
-    static void template(Div<?> container) {
-            container
-                .img().attrClass("img-responsive").attrSrc("/resources/images/pets.png")
-                .__()
-                .h2()
-                    .text("Something happened...")
-                .__()
-                .p()
-                    .<Exception>dynamic((p, ex) -> p.text(ex.getMessage()))
-                .__();
-    }
+	static void template(Div<?> container) {
+		container.img()
+			.attrClass("img-responsive")
+			.attrSrc("/resources/images/pets.png")
+			.__()
+			.h2()
+			.text("Something happened...")
+			.__()
+			.p()
+			.<Exception>dynamic((p, ex) -> p.text(ex.getMessage()))
+			.__();
+	}
+
 }

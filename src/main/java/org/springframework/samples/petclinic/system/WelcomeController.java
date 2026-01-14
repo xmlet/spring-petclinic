@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 class WelcomeController {
 
-    private final String html = Layout.view(Welcome::template).render();
+	private final String html = Layout.view(Welcome::template).render();
 
 	@GetMapping("/")
 	@ResponseBody

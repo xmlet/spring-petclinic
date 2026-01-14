@@ -41,8 +41,8 @@ class VetController {
 	@GetMapping("/vets.html")
 	@ResponseBody
 	public String showVetList(Map<String, Object> model) {
-        Collection<Vet> vets = this.vets.findAll();
-        return VetList.view.render(vets);
+		Collection<Vet> vets = this.vets.findAll();
+		return VetList.view.render(vets);
 	}
 
 	@GetMapping({ "/vets" })

@@ -10,9 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ExceptionHandlingController {
 
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    public String handleError(HttpServletRequest req, Exception ex) {
-        return Error.view.render(ex);
-    }
+	@ExceptionHandler(Exception.class)
+	@ResponseBody
+	public String handleError(HttpServletRequest req, Exception ex) {
+		return Error.view.render(ex);
+	}
+
 }

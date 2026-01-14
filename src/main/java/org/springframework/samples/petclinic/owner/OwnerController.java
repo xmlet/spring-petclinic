@@ -43,8 +43,8 @@ import java.util.Map;
  * @author Michael Isvy
  * @author Miguel Gamboa
  *
- * This controller is based on seminal implementation for Thymeleaf and modified
- * for HtmlFlow.
+ * This controller is based on seminal implementation for Thymeleaf and modified for
+ * HtmlFlow.
  */
 @Controller
 class OwnerController {
@@ -66,16 +66,18 @@ class OwnerController {
 	@GetMapping("/owners/new")
 	@ResponseBody
 	public String initCreationForm(Map<String, Object> model) {
-        return CreateOrUpdateOwnerForm.view.render();
+		return CreateOrUpdateOwnerForm.view.render();
 	}
 
 	@PostMapping("/owners/new")
 	@ResponseBody
-	public String processCreationForm(@Valid Owner owner, BindingResult result, HttpServletResponse response) throws IOException {
+	public String processCreationForm(@Valid Owner owner, BindingResult result, HttpServletResponse response)
+			throws IOException {
 		if (result.hasErrors()) {
-            /**
-             * !!! To Do: add errors from BindingResult to the model to be rendered by the view.
-             */
+			/**
+			 * !!! To Do: add errors from BindingResult to the model to be rendered by the
+			 * view.
+			 */
 			return CreateOrUpdateOwnerForm.view.render();
 		}
 		else {
@@ -114,16 +116,13 @@ class OwnerController {
 
 	@PostMapping("/owners/{ownerId}/edit")
 	@ResponseBody
-	public String processUpdateOwnerForm(
-	    @Valid Owner owner,
-	    BindingResult result,
-		@PathVariable("ownerId") int ownerId,
-		HttpServletResponse response) throws IOException
-    {
+	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
+			HttpServletResponse response) throws IOException {
 		if (result.hasErrors()) {
-            /**
-             * !!! To Do: add errors from BindingResult to the model to be rendered by the view.
-             */
+			/**
+			 * !!! To Do: add errors from BindingResult to the model to be rendered by the
+			 * view.
+			 */
 			return CreateOrUpdateOwnerForm.view.render(owner);
 		}
 		else {
