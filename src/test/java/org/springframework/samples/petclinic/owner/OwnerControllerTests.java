@@ -18,37 +18,40 @@ package org.springframework.samples.petclinic.owner;
 
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
 
 import org.assertj.core.util.Lists;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.http.MediaType;
+import org.springframework.samples.petclinic.views.CreateOrUpdateOwnerForm;
+import org.springframework.samples.petclinic.views.OwnerDetails;
+import org.springframework.samples.petclinic.views.OwnersFind;
+import org.springframework.samples.petclinic.views.OwnersList;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /**
  * Test class for {@link OwnerController}
  *
  * @author Colin But
  */
-@WebMvcTest(OwnerController.class)
+@WebMvcTest(value = OwnerController.class,
+		includeFilters = @ComponentScan.Filter(
+				value = { CreateOrUpdateOwnerForm.class, OwnerDetails.class, OwnersFind.class, OwnersList.class },
+				type = FilterType.ASSIGNABLE_TYPE))
 class OwnerControllerTests {
 
 	private static final int TEST_OWNER_ID = 1;
@@ -56,10 +59,10 @@ class OwnerControllerTests {
 	@Autowired
 	private MockMvc mockMvc;
 
-	@MockBean
+	@MockitoBean
 	private OwnerRepository owners;
 
-	@MockBean
+	@MockitoBean
 	private VisitRepository visits;
 
 	private Owner george;
@@ -80,20 +83,24 @@ class OwnerControllerTests {
 		max.setType(dog);
 		max.setName("Max");
 		max.setBirthDate(LocalDate.now());
+		max.setOwner(george);
 		george.setPetsInternal(Collections.singleton(max));
 		given(this.owners.findById(TEST_OWNER_ID)).willReturn(george);
 		Visit visit = new Visit();
 		visit.setDate(LocalDate.now());
+		visit.setDescription("Visit checkup routine.");
+		visit.setPetId(max.getId());
 		given(this.visits.findByPetId(max.getId())).willReturn(Collections.singletonList(visit));
 	}
 
 	@Test
 	void testInitCreationForm() throws Exception {
-		mockMvc.perform(get("/owners/new")).andExpect(status().isOk());
-		/*
-		 * .andExpect(model().attributeExists("owner"))
-		 * .andExpect(view().name("owners/createOrUpdateOwnerForm"));
-		 */
+		mockMvc.perform(get("/owners/new"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+			.andExpect(content().string(containsString("Owner")))
+			.andExpect(content().string(containsString("First Name")))
+			.andExpect(content().string(containsString("Last Name")));
 	}
 
 	@Test
@@ -111,62 +118,54 @@ class OwnerControllerTests {
 	void testProcessCreationFormHasErrors() throws Exception {
 		mockMvc
 			.perform(post("/owners/new").param("firstName", "Joe").param("lastName", "Bloggs").param("city", "London"))
-			.andExpect(status().isOk());
-		/*
-		 * .andExpect(model().attributeHasErrors("owner"))
-		 * .andExpect(model().attributeHasFieldErrors("owner", "address"))
-		 * .andExpect(model().attributeHasFieldErrors("owner", "telephone"))
-		 * .andExpect(view().name("owners/createOrUpdateOwnerForm"));
-		 */
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+			.andExpect(content().string(containsString("Owner")));
+		// .andExpect(content().string(containsString("is required")));
 	}
 
 	@Test
 	void testInitFindForm() throws Exception {
-		mockMvc.perform(get("/owners/find")).andExpect(status().isOk());
-		/*
-		 * .andExpect(model().attributeExists("owner"))
-		 * .andExpect(view().name("owners/findOwners"));
-		 */
+		mockMvc.perform(get("/owners/find"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+			.andExpect(content().string(containsString("Find Owners")))
+			.andExpect(content().string(containsString("Last name")));
 	}
 
 	@Test
 	void testProcessFindFormSuccess() throws Exception {
-		// given(this.owners.findByLastName("")).willReturn(Lists.newArrayList(george, new
-		// Owner()));
-		mockMvc.perform(get("/owners")).andExpect(status().isOk());
-		// .andExpect(view().name("owners/ownersList"));
+		mockMvc.perform(get("/owners"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+			.andExpect(content().string(containsString("Owners")));
 	}
 
 	@Test
 	void testProcessFindFormByLastName() throws Exception {
-		// given(this.owners.findByLastName(george.getLastName())).willReturn(Lists.newArrayList(george));
+		given(this.owners.findByLastName(george.getLastName())).willReturn(Lists.newArrayList(george));
 		mockMvc.perform(get("/owners").param("lastName", "Franklin")).andExpect(status().isOk());
-		// .andExpect(view().name("redirect:/owners/" + TEST_OWNER_ID));
 	}
 
 	@Test
 	void testProcessFindFormNoOwnersFound() throws Exception {
-		mockMvc.perform(get("/owners").param("lastName", "Unknown Surname")).andExpect(status().isOk());
-		/*
-		 * .andExpect(model().attributeHasFieldErrors("owner", "lastName"))
-		 * .andExpect(model().attributeHasFieldErrorCode("owner", "lastName", "notFound"))
-		 * .andExpect(view().name("owners/findOwners"));
-		 */
+		mockMvc.perform(get("/owners").param("lastName", "Unknown Surname"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+			.andExpect(content().string(containsString("Owners")));
 	}
 
 	@Test
 	void testInitUpdateOwnerForm() throws Exception {
-		mockMvc.perform(get("/owners/{ownerId}/edit", TEST_OWNER_ID)).andExpect(status().isOk());
-		/*
-		 * .andExpect(model().attributeExists("owner"))
-		 * .andExpect(model().attribute("owner", hasProperty("lastName", is("Franklin"))))
-		 * .andExpect(model().attribute("owner", hasProperty("firstName", is("George"))))
-		 * .andExpect(model().attribute("owner", hasProperty("address",
-		 * is("110 W. Liberty St.")))) .andExpect(model().attribute("owner",
-		 * hasProperty("city", is("Madison")))) .andExpect(model().attribute("owner",
-		 * hasProperty("telephone", is("6085551023"))))
-		 * .andExpect(view().name("owners/createOrUpdateOwnerForm"));
-		 */
+		mockMvc.perform(get("/owners/{ownerId}/edit", TEST_OWNER_ID))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+			.andExpect(content().string(containsString("Owner")))
+			.andExpect(content().string(containsString("Franklin")))
+			.andExpect(content().string(containsString("George")))
+			.andExpect(content().string(containsString("110 W. Liberty St.")))
+			.andExpect(content().string(containsString("Madison")))
+			.andExpect(content().string(containsString("6085551023")));
 	}
 
 	@Test
@@ -178,48 +177,31 @@ class OwnerControllerTests {
 				.param("city", "London")
 				.param("telephone", "01616291589"))
 			.andExpect(status().is3xxRedirection());
-		/*
-		 * .andExpect(view().name("redirect:/owners/{ownerId}"));
-		 */
 	}
 
 	@Test
 	void testProcessUpdateOwnerFormHasErrors() throws Exception {
-		/*
-		 * mockMvc.perform(post("/owners/{ownerId}/edit",
-		 * TEST_OWNER_ID).param("firstName", "Joe") .param("lastName",
-		 * "Bloggs").param("city", "London")).andExpect(status().isOk());
-		 * .andExpect(model().attributeHasErrors("owner"))
-		 * .andExpect(model().attributeHasFieldErrors("owner", "address"))
-		 * .andExpect(model().attributeHasFieldErrors("owner", "telephone"))
-		 * .andExpect(view().name("owners/createOrUpdateOwnerForm"));
-		 */
+		mockMvc
+			.perform(post("/owners/{ownerId}/edit", TEST_OWNER_ID).param("firstName", "Joe")
+				.param("lastName", "Bloggs")
+				.param("city", "London"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
+		// .andExpect(content().string(containsString("Owner")))
+		// .andExpect(content().string(containsString("is required")));
 	}
 
 	@Test
 	void testShowOwner() throws Exception {
-		// mockMvc.perform(get("/owners/{ownerId}",
-		// TEST_OWNER_ID)).andExpect(status().isOk());
-		/*
-		 * .andExpect(model().attribute("owner", hasProperty("lastName", is("Franklin"))))
-		 * .andExpect(model().attribute("owner", hasProperty("firstName", is("George"))))
-		 * .andExpect(model().attribute("owner", hasProperty("address",
-		 * is("110 W. Liberty St.")))) .andExpect(model().attribute("owner",
-		 * hasProperty("city", is("Madison")))) .andExpect(model().attribute("owner",
-		 * hasProperty("telephone", is("6085551023"))))
-		 * .andExpect(model().attribute("owner", hasProperty("pets", not(empty()))))
-		 * .andExpect(model().attribute("owner", hasProperty("pets", new
-		 * BaseMatcher<List<Pet>>() {
-		 *
-		 * @Override public boolean matches(Object item) {
-		 *
-		 * @SuppressWarnings("unchecked") List<Pet> pets = (List<Pet>) item; Pet pet =
-		 * pets.get(0); if (pet.getVisits().isEmpty()) { return false; } return true; }
-		 *
-		 * @Override public void describeTo(Description description) {
-		 * description.appendText("Max did not have any visits"); }
-		 * }))).andExpect(view().name("owners/ownerDetails"));
-		 */
+		mockMvc.perform(get("/owners/{ownerId}", TEST_OWNER_ID))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+			.andExpect(content().string(containsString("Franklin")))
+			.andExpect(content().string(containsString("George")))
+			.andExpect(content().string(containsString("110 W. Liberty St.")))
+			.andExpect(content().string(containsString("Madison")))
+			.andExpect(content().string(containsString("6085551023")))
+			.andExpect(content().string(containsString("Max")));
 	}
 
 }

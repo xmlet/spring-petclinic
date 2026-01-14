@@ -16,19 +16,23 @@
 
 package org.springframework.samples.petclinic.owner;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.http.MediaType;
+import org.springframework.samples.petclinic.views.CreateOrUpdateVisitForm;
 import org.springframework.samples.petclinic.visit.VisitRepository;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
@@ -36,7 +40,9 @@ import org.springframework.test.web.servlet.MockMvc;
  *
  * @author Colin But
  */
-@WebMvcTest(VisitController.class)
+@WebMvcTest(value = VisitController.class,
+		includeFilters = @ComponentScan.Filter(value = { CreateOrUpdateVisitForm.class },
+				type = FilterType.ASSIGNABLE_TYPE))
 class VisitControllerTests {
 
 	private static final int TEST_OWNER_ID = 1;
@@ -46,10 +52,10 @@ class VisitControllerTests {
 	@Autowired
 	private MockMvc mockMvc;
 
-	@MockBean
+	@MockitoBean
 	private VisitRepository visits;
 
-	@MockBean
+	@MockitoBean
 	private PetRepository pets;
 
 	@BeforeEach
@@ -59,8 +65,10 @@ class VisitControllerTests {
 
 	@Test
 	void testInitNewVisitForm() throws Exception {
-		mockMvc.perform(get("/owners/*/pets/{petId}/visits/new", TEST_PET_ID)).andExpect(status().isOk());
-		// .andExpect(view().name("pets/createOrUpdateVisitForm"));
+		mockMvc.perform(get("/owners/*/pets/{petId}/visits/new", TEST_PET_ID))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+			.andExpect(content().string(containsString("New Visit")));
 	}
 
 	@Test
@@ -70,7 +78,6 @@ class VisitControllerTests {
 				.param("name", "George")
 				.param("description", "Visit Description"))
 			.andExpect(status().is3xxRedirection());
-		// .andExpect(view().name("redirect:/owners/{ownerId}"));
 	}
 
 	@Test
@@ -78,9 +85,9 @@ class VisitControllerTests {
 		mockMvc
 			.perform(post("/owners/{ownerId}/pets/{petId}/visits/new", TEST_OWNER_ID, TEST_PET_ID).param("name",
 					"George"))
-			// .andExpect(model().attributeHasErrors("visit"))
-			.andExpect(status().isOk());
-		// .andExpect(view().name("pets/createOrUpdateVisitForm"));
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+			.andExpect(content().string(containsString("New Visit")));
 	}
 
 }
