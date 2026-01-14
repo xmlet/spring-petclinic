@@ -35,6 +35,7 @@ import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -67,6 +68,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Dave Syer
  */
 @DataJpaTest(includeFilters = @ComponentScan.Filter(Service.class))
+@Sql(scripts = "classpath:db/h2/data.sql")
 class ClinicServiceTests {
 
 	@Autowired
