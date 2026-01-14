@@ -75,7 +75,7 @@
         <dependency>
             <groupId>com.github.xmlet</groupId>
             <artifactId>htmlflow</artifactId>
-            <version>4.0</version>
+            <version>5.0.2</version>
         </dependency>
 
         <!-- Databases - Uses H2 by default -->
